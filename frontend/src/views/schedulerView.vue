@@ -4,8 +4,6 @@ import { Calendar } from 'v-calendar';
 import 'v-calendar/dist/style.css';
 import axios from '../../axios';
 
-const events = ref([]);
-const showModal = ref(false);
 const newEvent = ref({
   title: '',
   date: '',
@@ -13,17 +11,64 @@ const newEvent = ref({
   location: '',
 });
 
+
+const addEvent = async () => {
+    const response = await axios.post(`/add`, newEvent.value);
+    if(response.data.success){
+      alert(response.data.msg);
+    fetchEvents();
+    closeModal();
+    }else{
+    console.log('Failed to Add Event');
+    }
+  };
+
+const events = ref([]);
 const fetchEvents = async () => {
-  try {
-    const { data } = await axios.get(`/getEvents`);
-    events.value = data;
-  } catch (error) {
-    console.error('Error fetching events:', error);
+  try{
+    const response = await axios.get(`/getEvents?page=${currentPage.value}&limit=${perPage}`);
+    events.value = response.data.Results;
+    Totalevents.value = response.data.Totalevents;
+    currentPage.value = response.data.currentPage;
+    perPage.value = response.data.perPage;
+  }catch(error){
+    alert('Error Fetching Events',error);
   }
 };
 
-onMounted(fetchEvents);
+//Pages
+const currentPage = ref(0);
+const perPage = ref(0); // Number of items per page
+const Totalevents = ref(0);
 
+const goToPreviousPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+        fetchEvents();
+    }
+};
+
+const goToNextPage = () => {
+    const totalPages = Math.ceil(Totalevents.value / perPage.value);
+    if (currentPage.value < totalPages) {
+        currentPage.value++;
+        fetchEvents();
+    }
+};
+
+
+
+
+const deleteEvent = async (id) => {
+  try {
+    await axios.delete(`/delete/${id}`);
+    fetchEvents(); // Refresh the events list after deletion
+  } catch (error) {
+    console.error('Error deleting event:', error);
+  }
+};
+
+const showModal = ref(false);
 const openModal = () => {
   showModal.value = true;
 };
@@ -34,32 +79,12 @@ const closeModal = () => {
 };
 
 const resetNewEvent = () => {
-  Object.assign(newEvent, {
-    title: '',
-    date: '',
-    time: '',
-    location: '',
-  });
+  newEvent.value.title = '';
+  newEvent.value.date = '';
+  newEvent.value.time = '';
+  newEvent.value.location = '';
 };
 
-const addEvent = async () => {
-  try {
-    await axios.post(`/add`, newEvent);
-    fetchEvents(); // Refresh the events list
-    closeModal();
-  } catch (error) {
-    console.error('Error adding event:', error);
-  }
-};
-
-const deleteEvent = async (id) => {
-  try {
-    await axios.delete(`/delete/${id}`);
-    fetchEvents(); // Refresh the events list after deletion
-  } catch (error) {
-    console.error('Error deleting event:', error);
-  }
-};
 
 const formatDate = (date) =>
   new Date(date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
@@ -92,22 +117,36 @@ const calendarThemeStyles = {
 const onDayClick = (date) => {
   console.log('Day clicked:', date);
 };
+
+
+onMounted(fetchEvents);
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 p-8">
-    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-      <div class="flex flex-col lg:flex-row">
+  <div class=" w-full  bg-gradient-to-br from-indigo-100 lg:h-screen xl:h-screen    to-purple-100  ">
+      <div class="lg:flex xl:flex justify-center">
         <!-- Calendar Section -->
-        <div class="lg:w-1/2 w-full lg:p-6 xl:p-6 p-4 bg-gradient-to-br lg:h-[650px] xl:h-[500px] from-indigo-500 to-purple-600">
-          <div class="lg:mt-8 xl:mt-8 ">
-            <div class="bg-indigo-500 rounded-t-lg">
-            <h1 class="lg:text-4xl xl:text-4xl text-2xl mx-2  font-bold  text-white">Reminder Scheduler</h1>
-          </div>
+        
+        <div class="lg:w-[50%] xl:w-[50%] lg:p-6 xl:p-6 p-4 lg:h-[520px] xl:h-[520x]  lg:mt-12 xl:mt-12">
+          <div class="bg-gray-50  px-4  py-[22px] rounded-lg shadow-md">
+            <div class=" flex justify-start">
+              <button
+  @click="openModal"
+  class="w-[50%] text-center bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 mb-6"
+> ADD EVENT <i class="fas fa-plus ml-2"></i>
+</button>
+
+        </div>
+        <div class="mb-2">
+  <h1 class="lg:text-3xl xl:text-4xl text-2xl mx-2 text-indigo-700 font-semibold">
+     Set Schedule <i class="fas fa-calendar-alt"></i>
+  </h1>
+</div>
+
          <Calendar
   :attributes="calendarAttributes"
   @dayclick="onDayClick"
-  class="shadow-md bg-white min-w-full py-5 flex justify-center min-h-full relative rounded-lg overflow-hidden"
+  class="shadow-md bg-white min-w-full py-5  min-h-full  rounded-none rounded-b-lg "
   :theme-styles="calendarThemeStyles"
 />
 
@@ -116,29 +155,23 @@ const onDayClick = (date) => {
         </div>
 
         <!-- Events Section -->
-        <div class="lg:w-[50%] xl:w-[50%] p-6 bg-orange-500">
-          <div class="bg-green-500 flex justify-start">
-          <button
-            @click="openModal"
-            class="w-[50%] text-center bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 mb-6"
-          >
-            Add Event
-          </button>
-        </div>
+        <div class="lg:p-6 xl:p-6 p-4 lg:h-[520px] xl:h-[520px] h-[500px]  lg:mt-12 xl:mt-12">
+        
 
-          <div class="bg-gray-50 rounded-lg p-4 shadow-md lg:w-[530px] xl:w-[530px]">
-            <h2 class="text-2xl font-semibold mb-4 text-indigo-700 flex items-center">
-              Upcoming Events
-            </h2>
+          <div class="bg-gray-50 rounded-lg p-4 shadow-md  h-[480px] lg:w-[530px]  xl:w-[530px]">
+            <h2 class="text-2xl font-semibold mb-4 text-indigo-700 flex justify-center items-center">
+   Upcoming Events <i class="fas fa-clock ml-2"></i>
+</h2>
 
+                
             <TransitionGroup
               name="event-list"
               tag="ul"
-              class="space-y-3 max-h-[calc(100vh-300px)]  pr-2"
-            >              <li
+              class="space-y-3   max-h-[calc(100vh-300px)] bg-red-500"
+            >              <li v-if="events.length>0"
                 v-for="event in events"
                 :key="event.id"
-                class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300"
+                class="bg-white p-4 lg:w-[80%] h-full xl:w-[498px] w-full rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300"
               >
               <div class="flex">
                 <h3 class="font-medium text-lg text-indigo-600 flex-1">{{ event.title }}</h3>
@@ -169,8 +202,35 @@ const onDayClick = (date) => {
                 <p class="text-sm text-gray-600 mt-1">{{ event.location }}</p>
                
               </li>
+              <li v-else class="text-center text-gray-500 text-2xl font-semibold mt-[150px]">
+    No upcoming events.
+  </li>
+  <!-- Pagination Controls -->
+<div class="flex justify-between items-center px-1 bg-green-500">
+  <button
+    @click="goToPreviousPage"
+    class=" px-2 py-2 border rounded-lg bg-indigo-500 text-white"
+   
+  >
+   Previous
+  </button>
+
+  <span class="text-sm text-gray-600">
+    Page {{ currentPage }} of {{ Math.ceil(Totalevents / perPage) }}
+  </span>
+
+  <button
+    @click="goToNextPage"
+    class=" px-2 py-2 border rounded-lg bg-indigo-500 text-white"
+  >
+    Next
+  </button>
+</div>
+
             </TransitionGroup>
+           
             </div>
+      
         </div>
       </div>
     </div>
@@ -192,7 +252,7 @@ const onDayClick = (date) => {
               type="text"
               id="title"
               required
-              class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
@@ -202,7 +262,7 @@ const onDayClick = (date) => {
               type="date"
               id="date"
               required
-              class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
@@ -212,7 +272,7 @@ const onDayClick = (date) => {
               type="time"
               id="time"
               required
-              class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div>
@@ -222,7 +282,7 @@ const onDayClick = (date) => {
               type="text"
               id="location"
               required
-              class="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="w-full px-3 py-2 border border-black rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div class="flex justify-end space-x-3">
@@ -244,7 +304,6 @@ const onDayClick = (date) => {
       </div>
     </div>
     </Transition>
-  </div>
 </template>
 
 <style scoped>

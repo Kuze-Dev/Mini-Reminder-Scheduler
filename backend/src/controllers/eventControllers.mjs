@@ -1,39 +1,52 @@
-import {
-    getAllEvents,
-    createEvent,
-    getEventById,
-    deleteEvent,
-    updateEvent,
-  } from '../models/eventModels.mjs';
+import {createEventModel,getAllEventsModel,deleteEventModel,updateEvent, } from '../models/eventModels.mjs';
   
-  export const fetchEvents = (req, res) => {
-    getAllEvents((error, events) => {
-      if (error) return res.status(500).json({ error: 'Error fetching events' });
-      res.status(200).json(events);
-    });
-  };
+export const addEvent = (req, res) => {
+  const { title, date, time, location } = req.body;
+  const eventData = [ title, date, time, location];
+  createEventModel(eventData,(err, result) => {
+    if (err) {
+      console.error(err);
+      return res.json({ failed: 'false',msg:'Failed to Add Event' });
+    }else{
+    res.json({success:'true',msg:'Event Added Successfully'});
+    }
+  });
+};
+
+
+export const fetchEvents = (req, res) => {
+  const page = parseInt(req.query.page) || 1;        // Get current page, default to 1 if not provided
+  const limit = parseInt(req.query.limit) || 3;       // Items per page, default to 3 if not provided
+  const offset = (page - 1) * limit;                 // Calculate offset for pagination
+
+  // Call the model to fetch paginated events
+  getAllEventsModel(limit, offset, (err, results) => {
+      if (err) {
+          console.error(err);
+          return res.status(500).json({ success: false, msg: 'Failed to retrieve events' });
+      }
+
+      res.json({
+        Results: results.rows,
+        Totalevents: results.total,
+        currentPage: page,  
+        perPage: limit,  
+      });
+  });
+};
   
-  export const addEvent = (req, res) => {
-    createEvent(req.body, (error, newEvent) => {
-      if (error) return res.status(500).json({ error: 'Error adding event' });
-      res.status(201).json({newEvent,msg:'Event Added Successfully'});
-    });
-  };
   
-  export const fetchEventById = (req, res) => {
-    const { id } = req.params;
-    getEventById(id, (error, event) => {
-      if (error) return res.status(500).json({ error: 'Error fetching event' });
-      if (!event) return res.status(404).json({ error: 'Event not found' });
-      res.status(200).json(event);
-    });
-  };
   
   export const removeEvent = (req, res) => {
     const { id } = req.params;
-    deleteEvent(id, (error) => {
-      if (error) return res.status(500).json({ error: 'Error deleting event' });
-      res.status(200).json({ message: 'Event deleted successfully' });
+    const data = [id];
+    deleteEventModel(data, (err) => {
+      if (err){ 
+        console.error(err);
+      return res.json({ failed: 'Failed to Delete Event' });
+    }else{
+      res.json({success:'true', msg: 'Event Deleted Successfully'});
+    }
     });
   };
   

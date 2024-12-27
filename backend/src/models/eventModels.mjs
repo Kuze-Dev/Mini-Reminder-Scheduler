@@ -1,30 +1,38 @@
 import { connection } from '../config/db.mjs';
 
-export const getAllEvents = (callback) => {
-  const query = 'SELECT * FROM events ORDER BY date ASC';
-  connection.query(query, callback);
-};
 
-export const createEvent = (eventData, callback) => {
-  const { title, date, time, location } = eventData;
+
+export const createEventModel = (data, callback) => {
   const query = 'INSERT INTO events (title, date, time, location) VALUES (?, ?, ?, ?)';
-  connection.query(query, [title, date, time, location], (error, result) => {
-    if (error) return callback(error);
-    callback(null, { id: result.insertId, ...eventData });
+  connection.query(query, data,callback);
+}
+
+export const getAllEventsModel = (limit, offset, callback) => {
+  const query = `
+  SELECT * FROM events
+  ORDER BY date DESC
+  LIMIT ? OFFSET ?;
+`;
+
+const countQuery = 'SELECT COUNT(*) AS total FROM events';
+
+// First, get the paginated results
+connection.query(query, [limit, offset], (err, results) => {
+  if (err) return callback(err);
+
+  // Then, count the total number of rows
+  connection.query(countQuery, (err, countResults) => {
+    if (err) return callback(err);
+
+    const total = countResults[0].total; // Get total count from the count query
+    callback(null, { rows: results, total });
   });
+});
 };
 
-export const getEventById = (id, callback) => {
-  const query = 'SELECT * FROM events WHERE id = ?';
-  connection.query(query, [id], (error, results) => {
-    if (error) return callback(error);
-    callback(null, results[0]);
-  });
-};
-
-export const deleteEvent = (id, callback) => {
+export const deleteEventModel = (data, callback) => {
   const query = 'DELETE FROM events WHERE id = ?';
-  connection.query(query, [id], callback);
+  connection.query(query, data, callback);
 };
 
 export const updateEvent = (id, eventData, callback) => {
