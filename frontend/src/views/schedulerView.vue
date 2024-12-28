@@ -23,16 +23,21 @@ const addEvent = async () => {
     }
   };
 
-const events = ref([]);
+  const events = ref([]);
 const fetchEvents = async () => {
-  try{
-    const response = await axios.get(`/getEvents?page=${currentPage.value}&limit=${perPage}`);
+  try {
+    const response = await axios.get(`/getEvents?page=${currentPage.value}&limit=${perPage.value}`);
     events.value = response.data.Results;
     Totalevents.value = response.data.Totalevents;
     currentPage.value = response.data.currentPage;
     perPage.value = response.data.perPage;
-  }catch(error){
-    alert('Error Fetching Events',error);
+
+    // Check if the current page is empty after fetching
+    if (events.value.length === 0 && currentPage.value > 1) {
+      goToPreviousPage(); // Go to the previous page if the current page is empty
+    }
+  } catch (error) {
+    alert('Error Fetching Events', error);
   }
 };
 
@@ -167,14 +172,14 @@ onMounted(fetchEvents);
             <TransitionGroup
               name="event-list"
               tag="ul"
-              class="space-y-3   max-h-[calc(100vh-300px)] bg-red-500"
+              class="space-y-3   h-[365px]"
             >              <li v-if="events.length>0"
                 v-for="event in events"
                 :key="event.id"
-                class="bg-white p-4 lg:w-[80%] h-full xl:w-[498px] w-full rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300"
+                class="bg-white p-4 lg:w-[80%]  xl:w-[498px] w-full rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300"
               >
               <div class="flex">
-                <h3 class="font-medium text-lg text-indigo-600 flex-1">{{ event.title }}</h3>
+                <h3 class="font-medium text-lg text-indigo-600 flex-1"><i class="fas fa-pen-nib mr-2"></i>{{ event.title }}</h3>
                 <button   class="mr-4" title="Edit">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 fill-blue-500 hover:fill-blue-700"
                   viewBox="0 0 348.882 348.882">
@@ -196,17 +201,23 @@ onMounted(fetchEvents);
                 </svg>
               </button>
               </div>
-                <p class="text-sm text-gray-600 mt-1">
-                  {{ formatDate(event.date) }} at {{ formatTime(event.time) }}
-                </p>
-                <p class="text-sm text-gray-600 mt-1">{{ event.location }}</p>
+              <p class="text-sm text-gray-600 mt-1 flex items-center">
+  <i class="fas fa-calendar-alt mr-2 text-gray-500"></i> 
+  {{ formatDate(event.date) }} at 
+  <i class="fas fa-clock mx-1 text-gray-500"></i> 
+  {{ formatTime(event.time) }}
+</p>
+                <p class="text-sm text-gray-600 mt-1">  <i class="fas fa-map-marker-alt mr-2 text-gray-500"></i> {{ event.location }}</p>
                
               </li>
               <li v-else class="text-center text-gray-500 text-2xl font-semibold mt-[150px]">
     No upcoming events.
   </li>
-  <!-- Pagination Controls -->
-<div class="flex justify-between items-center px-1 bg-green-500">
+ 
+
+            </TransitionGroup>
+ <!-- Pagination Controls -->
+ <div class="flex justify-between items-center px-1">
   <button
     @click="goToPreviousPage"
     class=" px-2 py-2 border rounded-lg bg-indigo-500 text-white"
@@ -226,12 +237,10 @@ onMounted(fetchEvents);
     Next
   </button>
 </div>
-
-            </TransitionGroup>
-           
             </div>
       
         </div>
+        
       </div>
     </div>
 
