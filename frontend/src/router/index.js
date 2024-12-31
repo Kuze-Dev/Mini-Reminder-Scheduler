@@ -5,12 +5,22 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'scheduler',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/schedulerView.vue'),
+      name: 'login',
+  
+      component: () => import('../views/loginView.vue'),
     },
+    {
+      path: '/register',
+      name: 'register',
+  
+      component: () => import('../views/registerView.vue'),
+    },
+    {
+      path: '/schedule',
+      name: 'schedule',
+  
+      component: () => import('../views/schedulerView.vue'),
+    }
   ],
 })
 

@@ -4,9 +4,8 @@
 
 <template>
   <header>
-   
       <nav>
-        <RouterLink v-if="null" to="/">Calendar</RouterLink>
+        <RouterLink v-if="null" to="/schedule">SCHEDULE</RouterLink>
       </nav>
   </header>
 
