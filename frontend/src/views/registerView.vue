@@ -3,7 +3,7 @@
       <section
         class="lg:flex xl:flex justify-center items-center lg:w-[60%] xl:w-[60%] w-[90%]  lg:h-[380px] xl:h-[420px] h-[300px]  rounded-lg relative lg:mt-0 xl:mt-0 mt-[90px]"
       >
-        <!-- Form Section -->
+        <!-- Form Section 1asd -->
         <div class="lg:rounded-l-lg xl:rounded-l-lg lg:rounded-none xl:rounded-none rounded-t-lg shadow-md border bg-white w-full lg:w-1/2 xl:w-1/2 lg:py-5 xl:py-5 py-2  pb-3">
           <form class="mx-3">
             <h1 class="text-3xl lg:text-4xl font-sans font-bold text-blue-500">Sign Up</h1>
