@@ -2,12 +2,12 @@ import { connection } from '../config/db.mjs';
 
 
 
-export const createEventModel = (data, callback) => {
+export function createEventModel (data, callback){
   const query = 'INSERT INTO events (title, date, time, location) VALUES (?, ?, ?, ?)';
   connection.query(query, data,callback);
 }
 
-export const getAllEventsModel = (limit, offset, callback) => {
+export function getAllEventsModel(limit, offset, callback) {
   const query = `
   SELECT * FROM events
   ORDER BY date DESC
@@ -30,12 +30,12 @@ connection.query(query, [limit, offset], (err, results) => {
 });
 };
 
-export const deleteEventModel = (data, callback) => {
+export function deleteEventModel(data, callback) {
   const query = 'DELETE FROM events WHERE id = ?';
   connection.query(query, data, callback);
 };
 
-export const updateEvent = (id, eventData, callback) => {
+export function updateEvent(id, eventData, callback) {
   const { title, date, time, location } = eventData;
   const query =
     'UPDATE events SET title = ?, date = ?, time = ?, location = ? WHERE id = ?';

@@ -128,11 +128,12 @@ onMounted(fetchEvents);
 </script>
 
 <template>
-  <div class=" w-full  bg-gradient-to-br from-indigo-100 lg:h-screen xl:h-screen    to-purple-100  ">
+  <main class="flex justify-center items-center w-full">
+  <div class=" lg:w-[1500px] xl:w-[1500px] w-full  bg-gradient-to-br from-indigo-100 lg:h-screen xl:h-screen    to-purple-100  ">
       <div class="lg:flex xl:flex justify-center">
         <!-- Calendar Section -->
         
-        <div class="lg:w-[50%] xl:w-[50%] lg:p-6 xl:p-6 p-4 lg:h-[520px] xl:h-[520x]  lg:mt-12 xl:mt-12">
+        <div class="lg:w-[50%] xl:w-[30%]  lg:p-6 xl:p-6 p-4 lg:h-[520px] xl:h-[520x]  lg:mt-12 xl:mt-12">
           <div class="bg-gray-50  px-4  py-[22px] rounded-lg shadow-md">
             <div class=" flex justify-start">
               <button
@@ -313,6 +314,7 @@ onMounted(fetchEvents);
       </div>
     </div>
     </Transition>
+  </main>
 </template>
 
 <style scoped>
