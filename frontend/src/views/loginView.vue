@@ -1,7 +1,11 @@
 <script setup>
 import { ref } from 'vue';
 import axios from '../../axios';
-import { useAuthStore } from '@/stores/store'
+import { useAuthStore } from '@/stores/store';
+import loaderComponent from '@/components/loaderComponent.vue'; // Import the loader component
+
+// Reference the loader instance
+const loaderRef = ref();
 
 const data = ref({
   email: '',
@@ -10,18 +14,25 @@ const data = ref({
 
 const authStore = useAuthStore();
 
-const submit =() => {
-   axios.post('/login', data.value).then((response)=>{
+const submit = async () => {
+  loaderRef.value.startLoader(); // Start the loader
+  const response = await axios.post('/login', data.value);
+
+  setTimeout(() => {
     if (response.data.success) {
-      alert(response.data.message);
       authStore.setToken(response.data.token);
       location.reload();
-    } else {
+    } else  {
       alert('Login Failed!');
-    }
-  })
+    } 
+    loaderRef.value.stopLoader(); // Stop the loader after timeout
+  }, 1000); // Set a 1-second delay
 };
+
 </script>
+
+
+
 
 <template>
   <main class="w-full fixed h-full flex justify-center items-center">
@@ -64,6 +75,8 @@ const submit =() => {
           >
             Log in
           </button>
+            <!-- Include the Loader Component -->
+    <loaderComponent ref="loaderRef" />
           <!-- Register Link -->
           <p class="text-center text-sm lg:text-base mt-3">
             Don't have an account?

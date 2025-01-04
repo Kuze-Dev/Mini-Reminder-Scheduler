@@ -7,8 +7,24 @@ const form = ref({
   lastname: '',
   email: '',
   password: '',
-  profileImage: null,
+  profileImage: '',
 });
+
+// Ref for the file input element
+const fileInputRef = ref(null);
+
+const resetForm = () => {
+  form.value.firstname = '';
+  form.value.lastname = '';
+  form.value.email = '';
+  form.value.password = '';
+  form.value.profileImage = '';
+  
+  // Reset the file input
+  if (fileInputRef.value) {
+    fileInputRef.value.value = ''; // Clear the file input
+  }
+};
 
 const handleFileUpload = (event) => {
   form.value.profileImage = event.target.files[0];
@@ -28,6 +44,7 @@ const handleSubmit = async () => {
     const response = await axios.post('/user', formData);
     if (response.data.success) {
       alert(response.data.message);
+      resetForm();
     } else {
       alert('Error Adding User');
     }
@@ -103,7 +120,7 @@ const handleSubmit = async () => {
           <!-- File Upload Input -->
           <div>
             <label for="profileImage" class="block text-base lg:text-lg font-medium mb-1">Profile Image</label>
-            <input
+            <input ref="fileInputRef"
               type="file"
               id="profileImage"
               class="block w-full   text-sm lg:text-base"

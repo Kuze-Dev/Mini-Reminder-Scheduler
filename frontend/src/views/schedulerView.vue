@@ -150,7 +150,7 @@ onMounted(fetchSchedule);
           <div class="flex justify-start">
             <button
               @click="openModal"
-              class="lg:w-[25%] xl:w-[25%] w-[60%]   text-center bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 text-white font-bold py-3  rounded-lg transition-transform transform hover:scale-105 mb-6"
+              class=" shadow-md lg:w-[25%] xl:w-[25%] w-[60%]   text-center bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 text-white font-bold py-3  rounded-lg transition-transform transform hover:scale-105 mb-6"
             >
               ADD SCHEDULE <i class="fas fa-plus ml-2"></i>
             </button>

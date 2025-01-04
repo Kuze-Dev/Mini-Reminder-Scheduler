@@ -51,7 +51,7 @@ onMounted(fetchEvents);
      <main class="w-full">
       <headerComponent/>
 
-      <div class="flex justify-center lg:p-6 xl:p-6 p-4 lg:h-[550px] xl:h-[550px] h-[500px] bg-red-500 ">
+      <div class="flex justify-center  h-[550px] bg-red-500 ">
      
         <div class="bg-gray-50 lg:h-4 xl:h-4  h-1  mt-20  lg:w-[50%] xl:w-[50%] w-[85%] flex justify-center  rounded-lg shadow-md">
            

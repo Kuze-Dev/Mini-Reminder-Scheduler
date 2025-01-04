@@ -35,6 +35,12 @@ const router = createRouter({
       name: 'schedule',
       component: () => import('../views/schedulerView.vue'),
       meta: {requiresAuth: true}
+    },
+    {
+      path: '/manage',
+      name: 'manage',
+      component: () => import('../views/manageaccountView.vue'),
+      meta: {requiresAuth: true}
     }
   ],
 })

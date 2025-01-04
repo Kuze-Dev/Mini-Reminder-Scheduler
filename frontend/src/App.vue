@@ -93,6 +93,7 @@ const logout = () => {
         <h6 class="text-blue-600 text-sm font-bold px-4">Settings</h6>
         <ul class="mt-3">
           <li>
+            <RouterLink to="/manage">
             <a href="javascript:void(0)"
               class="text-black hover:text-blue-600 text-sm flex items-center hover:bg-blue-50 rounded px-4 py-3 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-[18px] h-[18px] mr-4"
@@ -103,6 +104,7 @@ const logout = () => {
               </svg>
               <span>Manage Account</span>
             </a>
+          </RouterLink>
           </li>
             <li>
             <a href="javascript:void(0)"

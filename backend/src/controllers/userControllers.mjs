@@ -8,10 +8,10 @@ const JWT_SECRET = 'your_jwt_secret_key'; // Replace with an environment variabl
 
 export async function addUser(req, res) {
     const user_id = uuidv4(); // Generate a new UUID for the user ID
-    const { firstname, lastname, email, password } = req.body;
+    const { firstname, lastname, email, password} = req.body;
     const profileImage = req.file.filename;
     const passwordHash = bcrypt.hashSync(password, 2); // Sync hash
-    const data = [user_id, firstname, lastname, email, passwordHash, profileImage];
+    const data = [user_id, firstname, lastname, email, passwordHash,'User','Active', profileImage];
     
     addUserModel(data, (err, results) => {
         if (err) {
