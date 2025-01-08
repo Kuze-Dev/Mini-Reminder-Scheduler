@@ -3,7 +3,21 @@ import { ref, onMounted } from 'vue';
 import axios from '../../axios';
 import headerComponent from '../components/headerComponent.vue'
 import footerComponent from '../components/footerComponent.vue'
+import {useAuthStore} from '@/stores/store.js';
+import {decodeJWT} from '@/stores/decode.js';
 
+const userId =ref(null);
+
+const store = useAuthStore();
+
+if(store.token){
+  const decodeToken = decodeJWT(store.token);
+  userId.value = decodeToken.user_id;
+}
+
+onMounted(()=>{
+  console.log(userId.value);
+})
 
 const newSchedule = ref({
   title: '',
@@ -21,7 +35,7 @@ const editSchedule = ref({
 });
 
 const addSchedule = async () => {
-  const response = await axios.post(`/add`, newSchedule.value);
+  const response = await axios.post(`/add/${userId.value}`, newSchedule.value);
   if (response.data.success) {
     alert(response.data.msg);
     fetchSchedule();
@@ -34,7 +48,7 @@ const addSchedule = async () => {
 const schedules = ref([]);
 const fetchSchedule = async () => {
   try {
-    const response = await axios.get(`/getSchedules?page=${currentPage.value}&limit=${perPage.value}`);
+    const response = await axios.get(`/getSchedules/${userId.value}?page=${currentPage.value}&limit=${perPage.value}`);
     schedules.value = response.data.Results;
     Totalschedules.value = response.data.Totalschedules;
     currentPage.value = response.data.currentPage;
@@ -146,7 +160,7 @@ onMounted(fetchSchedule);
   <main class=" w-full ">
     <headerComponent/>
       <div class="lg:flex xl:flex justify-center">
-        <div class="lg:p-6 xl:p-6 p-4 lg:h-[550px] xl:h-[550px] h-full ">
+        <div class="lg:p-6 xl:p-6 p-4 lg:h-[440px] xl:h-[500px] h-[730px] ">
           <div class="flex justify-start">
             <button
               @click="openModal"
@@ -155,18 +169,18 @@ onMounted(fetchSchedule);
               ADD SCHEDULE <i class="fas fa-plus ml-2"></i>
             </button>
           </div>
-          <div class="bg-gray-50 rounded-lg p-4 shadow-md lg:h-[500px] xl:h-[370px] h-full lg:w-[800px] xl:w-[800px]">
+          <div class="bg-gray-50 rounded-lg p-4 shadow-md lg:h-[500px] xl:h-[400px] h-[640px]  lg:w-[800px] xl:w-[800px]">
             <h2 class="text-2xl font-semibold mb-4 text-indigo-700 flex justify-start">
               Schedule <i class="fas fa-clock ml-2 mt-1"></i>
             </h2>
-            <div class="grid grid-cols-1 lg:xl:grid-cols-2 xl:grid-cols-2 gap-1 lg:h-[225px]  xl:h-[225px]  h-full">
+            <div class="grid grid-cols-1 lg:xl:grid-cols-2 xl:grid-cols-2 gap-1 lg:h-[225px]  xl:h-[225px]  h-[500px]">
               <div
                 v-if="schedules.length > 0"
                 v-for="schedule in schedules"
                 :key="schedule.id"
                 class="bg-white p-4 h-[110px] py-3 w-full  rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300"
               >
-                <div class="flex">
+                <div class="flex ">
                   <h3 class="font-medium text-lg text-indigo-600 flex-1">
                     <i class="fas fa-pen-nib mr-2"></i>{{ schedule.title }}
                   </h3>
@@ -200,12 +214,14 @@ onMounted(fetchSchedule);
                 <p class="text-sm text-gray-600 mt-1">
                   <i class="fas fa-map-marker-alt mr-2 text-gray-500"></i> {{ schedule.location }}
                 </p>
+                
               </div>
               <div v-else class="col-span-full text-center text-gray-500 text-2xl font-semibold mt-[150px]">
                 No schedules.
               </div>
+
             </div>
-            <div class="flex justify-between items-center px-1 py-4 lg:mt-0 xl:mt-0 mt-4">
+            <div class="flex justify-between items-center px-1 py-4 ">
               <button
                 @click="goToPreviousPage"
                 class="px-2 py-2 border rounded-lg bg-indigo-500 text-white"
@@ -222,8 +238,10 @@ onMounted(fetchSchedule);
                 Next
               </button>
             </div>
+           
           </div>
         </div>
+        
       </div>
     <div
       v-if="showModal"

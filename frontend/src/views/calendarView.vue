@@ -5,6 +5,16 @@ import 'v-calendar/dist/style.css';
 import axios from '../../axios';
 import headerComponent from '../components/headerComponent.vue'
 import footerComponent from '../components/footerComponent.vue'
+import {useAuthStore} from '@/stores/store.js';
+import {decodeJWT} from '@/stores/decode.js';
+
+const store = useAuthStore();
+const userId = ref(null);
+
+if(store.token){
+  const decodeToken = decodeJWT(store.token);
+  userId.value = decodeToken.user_id;
+}
 
 
 
@@ -35,7 +45,7 @@ const onDayClick = (date) => {
 const calendar = ref([]);
 const fetchEvents = async () => {
   try {
-    const response = await axios.get(`/getSchedules`);
+    const response = await axios.get(`/getSchedules/${userId.value}`);
     calendar.value = response.data.Results;
    
   } catch (error) {

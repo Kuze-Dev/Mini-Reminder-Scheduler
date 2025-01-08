@@ -11,13 +11,18 @@ const logout = () => {
 </script>
 
 <template>
-  <main class="flex ">
-  <header v-if="authStore.token" class="lg:w-[200px] xl:w-[320px] bg-green-500">
-    <nav class="bg-white shadow-lg h-screen fixed top-0 left-0 min-w-[280px] py-6 px-4 font-[sans-serif] overflow-auto z-20 lg:block xl:block hidden">
-      <a href="javascript:void(0)"><img src="" alt="logo" class='w-[160px]' />
-      </a>
-
-      <ul class="mt-6">
+  <main class="flex  ">
+   
+  <header v-if="authStore.token" class="border w-screen  lg:w-[279px] xl:w-[300px] h-screen lg:pb-3 xl:pb-2  lg:block xl:block hidden">
+    <div class="left-0 min-w-[258px] fixed top-0 lg:block xl:block hidden z-20">
+<span class="bg-white h-[73px] flex mx- border-b border-r"> 
+  <div class="flex mx-[60px] ">
+        <img src="../src/assets/logo.png" alt="logo"  />
+    </div>
+    </span>  
+        <nav class="bg-white shadow-lg h-screen  min-w-[258px] border-r  py-6 px-4 font-[sans-serif] overflow-auto  ">
+   
+      <ul>
         <li>
           <RouterLink to="/">
           <a href="javascript:void(0)"
@@ -152,6 +157,7 @@ const logout = () => {
 
      
     </nav>
+    </div>
   </header>
 
   <RouterView />

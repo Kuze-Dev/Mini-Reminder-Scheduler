@@ -1,8 +1,9 @@
 import { addScheduleModel,fetchScheduleModel,deleteScheduleModel,updateScheduleModel } from '../models/scheduleModels.mjs';
   
 export function addSchedule (req, res) {
+  const userId =req.params.id;
   const { title, date, time, location } = req.body;
-  const scheduleData = [ title, date, time, location];
+  const scheduleData = [userId, title, date, time, location];
   addScheduleModel(scheduleData,(err, result) => {
     if (err) {
       console.error(err);
@@ -15,12 +16,13 @@ export function addSchedule (req, res) {
 
 
 export function fetchSchedule(req, res){
+  const userId =req.params.id;
   const page = parseInt(req.query.page) || 1;        // Get current page, default to 1 if not provided
   const limit = parseInt(req.query.limit) || 4;       // Items per page, default to 3 if not provided
   const offset = (page - 1) * limit;                 // Calculate offset for pagination
 
  
-  fetchScheduleModel(limit, offset, (err, results) => {
+  fetchScheduleModel(limit, offset,userId, (err, results) => {
       if (err) {
           console.error(err);
           return res.status(500).json({ success: false, msg: 'Failed to retrieve schedules' });

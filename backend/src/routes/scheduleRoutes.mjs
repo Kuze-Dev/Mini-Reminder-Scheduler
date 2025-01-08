@@ -3,8 +3,8 @@ import express from 'express';
 
 const router = express.Router();
 
-router.post('/add', addSchedule);
-router.get('/getSchedules', fetchSchedule);
+router.post('/add/:id', addSchedule);
+router.get('/getSchedules/:id', fetchSchedule);
 router.delete('/delete/:id', deleteSchedule);
 router.put('/update/:id', updateSchedule);
 

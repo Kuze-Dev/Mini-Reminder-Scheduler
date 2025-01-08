@@ -10,3 +10,8 @@ export function loginUserModel(data, callback) {
     const query = 'SELECT * FROM users WHERE email=?';
     connection.query(query, data, callback);
 }
+
+export function getProfileDataModel(data,callback){
+    const query = 'SELECT * FROM users WHERE user_id=?';
+    connection.query(query,data,callback);
+}

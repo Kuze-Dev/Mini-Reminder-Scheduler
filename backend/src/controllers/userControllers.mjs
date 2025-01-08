@@ -1,4 +1,4 @@
-import {addUserModel,loginUserModel} from '../models/userModels.mjs'
+import {addUserModel,loginUserModel,getProfileDataModel} from '../models/userModels.mjs'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -51,8 +51,22 @@ export async function loginUser(req, res) {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ user_id: user.user_id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({user_id: user.user_id, email: user.email}, JWT_SECRET, { expiresIn: '1h' });
 
         res.json({ success: 'true', message: 'Login successful.', token });
     });
+  }
+
+
+  export function getProfileData(req,res){
+     const userId = req.params.id;
+     const data =[userId];
+     getProfileDataModel(data,(err,results)=>{
+    if(err){
+        console.error(err);
+        return res.json({failed:'false',msg:'Failed to Retrieve Profile User'});
+    }else{
+        res.json({success:'true',results});
+    }
+     })
   }
