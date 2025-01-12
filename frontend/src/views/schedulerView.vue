@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,computed } from 'vue';
 import axios from '../../axios';
 import headerComponent from '../components/headerComponent.vue'
 import footerComponent from '../components/footerComponent.vue'
@@ -66,6 +66,8 @@ const currentPage = ref(0);
 const perPage = ref(0);
 const Totalschedules = ref(0);
 
+const totalPages = computed(() => Math.ceil(Totalschedules.value / perPage.value));
+
 const goToPreviousPage = () => {
   if (currentPage.value > 1) {
     currentPage.value--;
@@ -77,6 +79,13 @@ const goToNextPage = () => {
   const totalPages = Math.ceil(Totalschedules.value / perPage.value);
   if (currentPage.value < totalPages) {
     currentPage.value++;
+    fetchSchedule();
+  }
+};
+
+const goToPage = (page) => {
+  if (page !== currentPage.value) {
+    currentPage.value = page;
     fetchSchedule();
   }
 };
@@ -157,23 +166,24 @@ onMounted(fetchSchedule);
 </script>
 
 <template>
-  <main class=" w-full ">
+  <main class=" w-full  ">
     <headerComponent/>
-      <div class="lg:flex xl:flex justify-center">
-        <div class="lg:p-6 xl:p-6 p-4 lg:h-[440px] xl:h-[500px] h-[730px] ">
-          <div class="flex justify-start">
+      <div class="lg:flex xl:flex justify-center bg-gray-100 items-center">
+        <div class="lg:p-6 xl:p-6 p-4  lg:h-[440px] lg:w-[900px] xl:w-[900px] w-full    mt-[65px] xl:h-[500px] h-full">
+          <div class="bg-white rounded-lg p-4 shadow-md lg:h-[500px] xl:h-[460px] h-[940px]  lg:w-[900px] xl:w-[900px] w-full">
+
+        
+            <h2 class="text-2xl font-semibold mb-4 text-center ">
+              Schedule <i class="fas fa-clock ml-2 mt-1"></i>
+            </h2>
             <button
               @click="openModal"
               class=" shadow-md lg:w-[25%] xl:w-[25%] w-[60%]   text-center bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 text-white font-bold py-3  rounded-lg transition-transform transform hover:scale-105 mb-6"
             >
               ADD SCHEDULE <i class="fas fa-plus ml-2"></i>
             </button>
-          </div>
-          <div class="bg-gray-50 rounded-lg p-4 shadow-md lg:h-[500px] xl:h-[400px] h-[640px]  lg:w-[800px] xl:w-[800px]">
-            <h2 class="text-2xl font-semibold mb-4 text-indigo-700 flex justify-start">
-              Schedule <i class="fas fa-clock ml-2 mt-1"></i>
-            </h2>
-            <div class="grid grid-cols-1 lg:xl:grid-cols-2 xl:grid-cols-2 gap-1 lg:h-[225px]  xl:h-[225px]  h-[500px]">
+        <div class="lg:h-[246px] xl:h-[246px] h-[750px]">
+            <div class="grid grid-cols-1 lg:xl:grid-cols-3 xl:grid-cols-3 gap-3 py-2 lg:h-[225px]  xl:h-[225px]  h-[500px]">
               <div
                 v-if="schedules.length > 0"
                 v-for="schedule in schedules"
@@ -221,23 +231,40 @@ onMounted(fetchSchedule);
               </div>
 
             </div>
-            <div class="flex justify-between items-center px-1 py-4 ">
-              <button
-                @click="goToPreviousPage"
-                class="px-2 py-2 border rounded-lg bg-indigo-500 text-white"
+          </div>
+          <div class="flex justify-center items-center gap-4 lg:mt-6 xl:mt-6">
+  <button
+    @click="goToPreviousPage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed"
+            >
+    Previous
+  </button>
+  
+  <!-- Page Numbers -->
+  <div v-if="totalPages > 0" class="flex gap-2">
+  <button
+    v-for="page in totalPages"
+    :key="page"
+    @click="goToPage(page)"
+    :class="[ 
+                  'px-3 py-1 rounded',
+                  currentPage === page ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                ]"
               >
-                Previous
-              </button>
-              <span class="text-sm text-gray-600">
-                Page {{ currentPage }} of {{ Math.ceil(Totalschedules / perPage) }}
-              </span>
-              <button
-                @click="goToNextPage"
-                class="px-2 py-2 border rounded-lg bg-indigo-500 text-white"
-              >
-                Next
-              </button>
-            </div>
+    {{ page }}
+  </button>
+</div>
+  
+  <button
+    @click="goToNextPage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed"
+            >
+    Next
+  </button>
+</div>
+
            
           </div>
         </div>
@@ -248,7 +275,7 @@ onMounted(fetchSchedule);
       @click.self="closeModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center h-screen z-50"
     >
-      <div class="bg-white p-8 rounded-2xl lg:w-[30%]  xl:w-[30%] ">
+      <div class="bg-white p-8 rounded-2xl lg:w-[30%]  xl:w-[30%] w-[95%] ">
         <h2 class="text-3xl font-bold mb-6 text-indigo-700">Add New Schedule</h2>
         <form @submit.prevent="addSchedule" class="space-y-4">
           <div>

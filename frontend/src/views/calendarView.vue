@@ -20,6 +20,7 @@ if(store.token){
 
 
 
+
 // Add styles to highlight scheduled days
 const calendarAttributes = computed(() =>
   calendar.value.map((event) => ({
@@ -63,14 +64,14 @@ onMounted(fetchEvents);
 
       <div class="flex justify-center  h-[550px] bg-red-500 ">
      
-        <div class="bg-gray-50 lg:h-4 xl:h-4  h-1  mt-20  lg:w-[50%] xl:w-[50%] w-[85%] flex justify-center  rounded-lg shadow-md">
+        <div class="bg-gray-50 lg:h-4 xl:h-4  h-1  lg:w-[50%] xl:w-[50%]  w-[85%] flex justify-center  rounded-lg shadow-md">
            
        
    
             <Calendar
      :attributes="calendarAttributes"
      @dayclick="onDayClick"
-     class="shadow-md bg-white min-w-full mx-auto py-5  min-h-[300px]   "
+     class="shadow-md bg-white  mt-[150px] min-w-full mx-auto py-5  min-h-[300px]   "
      :theme-styles="calendarThemeStyles"
    />
    

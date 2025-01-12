@@ -1,4 +1,4 @@
-import {addUserModel,loginUserModel,getProfileDataModel} from '../models/userModels.mjs'
+import {addUserModel,loginUserModel,getProfileDataModel,getAllUserModel, updateUserStatusModel,deleteUserModel,updateUserModel} from '../models/userModels.mjs'
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -10,7 +10,7 @@ export async function addUser(req, res) {
     const user_id = uuidv4(); // Generate a new UUID for the user ID
     const { firstname, lastname, email, password} = req.body;
     const profileImage = req.file.filename;
-    const passwordHash = bcrypt.hashSync(password, 2); // Sync hash
+    const passwordHash = bcrypt.hashSync(password, 10); // Sync hash
     const data = [user_id, firstname, lastname, email, passwordHash,'User','Active', profileImage];
     
     addUserModel(data, (err, results) => {
@@ -34,12 +34,12 @@ export async function loginUser(req, res) {
     loginUserModel(email, (err, results) => {
         if (err) {
             console.error(err);
-            return res.status(500).json({ success: 'false', message:'Internal server error' });
+            return res.status(500).json({ failed: 'false', msg:'Internal server error' });
         }
 
         // If user not found
         if (results.length === 0) {
-            return res.status(401).json({ success: 'false', message: 'User not found' });
+            return res.status(401).json({ failed: 'false', msg: 'User not found' });
         }
 
         const user = results[0];
@@ -47,7 +47,7 @@ export async function loginUser(req, res) {
         // Compare the provided password with the stored hash
         const isPasswordValid = bcrypt.compareSync(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ success: 'false', message: 'Invalid Credentials.' });
+            return res.status(401).json({ failed: 'false', msg: 'Invalid Credentials.' });
         }
 
         // Generate JWT token
@@ -69,4 +69,68 @@ export async function loginUser(req, res) {
         res.json({success:'true',results});
     }
      })
+  }
+
+  export function getAllUser(req,res){
+    const page = parseInt(req.query.page) || 1;      
+  const limit = parseInt(req.query.limit) || 6;       
+  const offset = (page - 1) * limit;     
+    getAllUserModel(limit, offset,(err,results)=>{
+        if(err){
+            console.error(err);
+            return res.json({failed:'false',msg:'Failed to Retrieve All User'});
+        }else{
+            res.json({results: results.rows,
+                totalUsers: results.total,
+                currentPage: page,  
+                perPage: limit,  });
+        }
+    })
+  }
+
+
+  export function updateUserStatus(req, res) {
+    const { id } = req.params; 
+    const { status } = req.body; // Get updated data from request body
+  
+    const data = [status,id];
+  
+    updateUserStatusModel(data, (err,results) => {
+      if (err) { 
+        console.error(err);
+        return res.json({ failed: 'Failed to Update Status' });
+      } else {
+        res.json({ success: 'true', msg: 'Status Updated Successfully' });
+      }
+    });
+  }
+
+  export function deleteUser(req, res) {
+    const { id } = req.params; 
+    const data = [id];
+   deleteUserModel(data, (err,results) => {
+      if (err) { 
+        console.error(err);
+        return res.json({ failed: 'Failed to Delete User' });
+      } else {
+        res.json({ success: 'true', msg: 'User Deleted Successfully' });
+      }
+    });
+  }
+
+  export function updateUser(req, res) {
+    const { id } = req.params; 
+    const {firstname,lastname,email,password} = req.body; // Get updated data from request body
+    const profileImage = req.file.filename;
+    const passwordHash = bcrypt.hashSync(password, 10); // Sync hash
+    const data = [firstname, lastname, email,passwordHash,profileImage, id];
+  
+    updateUserModel(data, (err,results) => {
+      if (err) { 
+        console.error(err);
+        return res.json({ failed: 'Failed to Update User' });
+      } else {
+        res.json({ success: 'true', msg: 'User Updated Successfully' });
+      }
+    });
   }

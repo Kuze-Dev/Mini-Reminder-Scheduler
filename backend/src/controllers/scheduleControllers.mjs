@@ -17,9 +17,9 @@ export function addSchedule (req, res) {
 
 export function fetchSchedule(req, res){
   const userId =req.params.id;
-  const page = parseInt(req.query.page) || 1;        // Get current page, default to 1 if not provided
-  const limit = parseInt(req.query.limit) || 4;       // Items per page, default to 3 if not provided
-  const offset = (page - 1) * limit;                 // Calculate offset for pagination
+  const page = parseInt(req.query.page) || 1;      
+  const limit = parseInt(req.query.limit) || 6;       
+  const offset = (page - 1) * limit;                 
 
  
   fetchScheduleModel(limit, offset,userId, (err, results) => {

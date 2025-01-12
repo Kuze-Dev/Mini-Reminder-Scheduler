@@ -35,7 +35,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <header class="  py-4 px-6   shadow-md bg-white flex justify-between ">
+  <header class="  py-4 px-6   shadow-md bg-white flex justify-between fixed lg:w-[1120px] top-0 xl:w-[1120px] w-full z-10">
     <!-- Logo -->
     <div class="text-lg font-bold mt-1">KRM</div>
 
@@ -50,8 +50,7 @@ onMounted(() => {
         <!-- User Profile Image -->
         <div>
           <img
-  :src="`http://localhost:3000/uploads/${user.profileImage}`"
-  alt="User Profile Image"
+          :src="`../src/assets/uploads/${user.profileImage}`"  alt="User Profile Image"
   class="w-10 h-10 rounded-full border-2 border-white"
 />
         </div>

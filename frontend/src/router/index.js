@@ -41,6 +41,12 @@ const router = createRouter({
       name: 'manage',
       component: () => import('../views/manageaccountView.vue'),
       meta: {requiresAuth: true}
+    },
+    {
+      path: '/alarm',
+      name: 'alarm',
+      component: () => import('../views/alarmView.vue'),
+      meta: {requiresAuth: true}
     }
   ],
 })
