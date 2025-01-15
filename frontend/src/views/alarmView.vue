@@ -2,7 +2,18 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import headerComponent from '../components/headerComponent.vue';
 import footerComponent from '../components/footerComponent.vue';
+import { useAuthStore } from "@/stores/store";
+import { decodeJWT } from "@/stores/decode";
 import axios from '../../axios';
+
+const store = useAuthStore();
+const userId = ref(null);
+
+if(store.token){
+  const decodeToken = decodeJWT(store.token);
+  userId.value = decodeToken.user_id;
+}
+
 
 const time = ref('');
 const date = ref('');
@@ -96,7 +107,7 @@ let alarmInterval = null;
 
 // Fetch Alarms
 const fetchAlarms = () => {
-  axios.get('/alarm').then((response) => {
+  axios.get(`/alarm/${userId.value}`).then((response) => {
     alarms.value = response.data.results;
   }).catch((error) => {
     console.error("Error fetching alarms:", error);
@@ -105,7 +116,7 @@ const fetchAlarms = () => {
 
 // Add Alarm
 const addAlarm = () => {
-  axios.post('/alarm', newAlarm.value).then((response) => {
+  axios.post(`/alarm/${userId.value}`, newAlarm.value).then((response) => {
     if (response.data.success) {
       alert(response.data.msg);
       fetchAlarms();
